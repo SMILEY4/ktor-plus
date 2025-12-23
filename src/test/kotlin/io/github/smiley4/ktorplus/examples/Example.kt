@@ -1,12 +1,16 @@
 package io.github.smiley4.ktorplus.examples
 
-import io.github.smiley4.ktorplus.data.HttpStatusCode
+import com.sun.beans.introspect.PropertyInfo
 import io.github.smiley4.ktoropenapi.OpenApi
+import io.github.smiley4.ktoropenapi.config.AuthKeyLocation
+import io.github.smiley4.ktoropenapi.config.AuthScheme
+import io.github.smiley4.ktoropenapi.config.AuthType
 import io.github.smiley4.ktoropenapi.config.ExampleEncoder
 import io.github.smiley4.ktoropenapi.config.SchemaGenerator
 import io.github.smiley4.ktoropenapi.openApi
 import io.github.smiley4.ktorplus.KtorPlusConfig
 import io.github.smiley4.ktorplus.data.Body
+import io.github.smiley4.ktorplus.data.HttpStatusCode
 import io.github.smiley4.ktorplus.data.Request
 import io.github.smiley4.ktorplus.data.Response
 import io.github.smiley4.ktorplus.post
@@ -15,6 +19,9 @@ import io.github.smiley4.ktorswaggerui.swaggerUI
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
+import io.ktor.server.auth.Authentication
+import io.ktor.server.auth.authenticate
+import io.ktor.server.auth.basic
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
@@ -34,6 +41,11 @@ private fun Application.myModule() {
         isLenient = true
     }
 
+    install(Authentication) {
+        basic("user_auth") {
+        }
+    }
+
     install(ContentNegotiation) {
         json(json)
     }
@@ -42,6 +54,12 @@ private fun Application.myModule() {
         info {
             title = "Group Vacation Planner API"
             version = "indev"
+        }
+        security {
+            securityScheme("user_auth") {
+                type = AuthType.HTTP
+                scheme = AuthScheme.BASIC
+            }
         }
         schemas {
             generator = SchemaGenerator.kotlinx(json)
@@ -63,18 +81,21 @@ private fun Application.myModule() {
         route("redoc") {
             redoc("/api.json")
         }
-        post<LoginRequest, LoginResponse>("/login", {
-            description = "Allows the user to log in with personal credentials. Provides token used for further authentication."
-        }) { request ->
-            try {
-                if (request.body.username == "myusername" && request.body.password == "mysecret") {
-                    LoginResponse.Success(AuthDataDto("myuserid", "mytoken"))
-                } else {
-                    LoginResponse.Unauthorized()
+        authenticate("user_auth") {
+
+            post<LoginRequest, LoginResponse>("/login", {
+                description = "Allows the user to log in with personal credentials. Provides token used for further authentication."
+            }) { request ->
+                try {
+                    if (request.body.username == "myusername" && request.body.password == "mysecret") {
+                        LoginResponse.Success(AuthDataDto("myuserid", "mytoken"))
+                    } else {
+                        LoginResponse.Unauthorized()
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    LoginResponse.InternalError()
                 }
-            } catch (e:Exception){
-                e.printStackTrace()
-                LoginResponse.InternalError()
             }
         }
     }

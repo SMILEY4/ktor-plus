@@ -1,5 +1,7 @@
 package io.github.smiley4.ktorplus
 
+import io.github.smiley4.ktoropenapi.config.RouteConfig
+import io.github.smiley4.ktoropenapi.documentation
 import io.github.smiley4.ktorplus.core.PropertyAnalyzer
 import io.github.smiley4.ktorplus.core.RequestHandler
 import io.github.smiley4.ktorplus.core.ResponseHandler
@@ -8,10 +10,10 @@ import io.github.smiley4.ktorplus.core.TypeDescriptorCache
 import io.github.smiley4.ktorplus.core.TypeDescriptorCreator
 import io.github.smiley4.ktorplus.data.TypeDescriptorEntry
 import io.github.smiley4.ktorplus.openapi.KtorPlusRouteOpenApiHandler
-import io.github.smiley4.ktoropenapi.config.RouteConfig
-import io.github.smiley4.ktoropenapi.documentation
 import io.ktor.http.HttpMethod
+import io.ktor.server.auth.AuthenticationRouteSelector
 import io.ktor.server.routing.Route
+import io.ktor.server.routing.RoutingNode
 import io.ktor.server.routing.method
 import io.ktor.server.routing.route
 import io.ktor.utils.io.KtorDsl
@@ -127,9 +129,26 @@ inline fun <reified TRequest : Any, reified TResponse : Any> Route.methodPlus(
     val requestHandler = RequestHandler(KtorPlusConfig.requestHandlers)
     val responseHandler = ResponseHandler(KtorPlusConfig.responseHandlers)
 
+    val authenticationNames = mutableSetOf<String>()
+    var currentRoutingNode: Route? = this
+    while (currentRoutingNode != null) {
+        currentRoutingNode = currentRoutingNode.parent
+        if (currentRoutingNode is RoutingNode) {
+            val selector = currentRoutingNode.selector
+            if (selector is AuthenticationRouteSelector) {
+                authenticationNames.addAll(selector.names.filterNotNull())
+            }
+        }
+    }
+
     return documentation(documentation) {
         documentation({
-            KtorPlusRouteOpenApiHandler(typeDescriptorCache).setup(this, typeOf<TRequest>(), typeOf<TResponse>())
+            KtorPlusRouteOpenApiHandler(typeDescriptorCache).setup(
+                this,
+                typeOf<TRequest>(),
+                typeOf<TResponse>(),
+                authenticationNames
+            )
         }) {
             method(method) {
                 handle {

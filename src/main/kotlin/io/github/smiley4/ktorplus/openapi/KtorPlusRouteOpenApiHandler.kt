@@ -15,7 +15,10 @@ import kotlin.reflect.full.hasAnnotation
 
 class KtorPlusRouteOpenApiHandler(private val typeDescriptors: TypeDescriptorCache) {
 
-    fun setup(routeConfig: RouteConfig, requestType: KType, rootResponseType: KType) {
+    fun setup(routeConfig: RouteConfig, requestType: KType, rootResponseType: KType, authenticationNames: Set<String>) {
+
+        // security
+        routeConfig.securitySchemeNames(authenticationNames)
 
         // request
         val requestTypeDescriptor = typeDescriptors.get(requestType)
