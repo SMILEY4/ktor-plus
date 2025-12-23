@@ -9,7 +9,8 @@ group = projectGroupId
 version = projectVersion
 
 plugins {
-    kotlin("jvm") version "2.2.21"
+    kotlin("jvm") version "2.3.0"
+    kotlin("plugin.serialization") version "2.3.0"
     id("org.jetbrains.dokka") version "1.9.20"
     id("org.owasp.dependencycheck") version "8.2.1"
     id("io.gitlab.arturbosch.detekt") version "1.23.0"
@@ -22,11 +23,39 @@ repositories {
 }
 
 dependencies {
+    // ktor
+    val versionKtor = "3.3.3"
+    implementation("io.ktor:ktor-server-core:$versionKtor")
+    implementation("io.ktor:ktor-server-netty:$versionKtor")
+    implementation("io.ktor:ktor-server-auth:${versionKtor}")
+    implementation("io.ktor:ktor-server-content-negotiation:${versionKtor}")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:${versionKtor}")
 
+    // OpenAPI
+    val versionOpenApiTools = "5.4.0"
+    implementation("io.github.smiley4:ktor-openapi:${versionOpenApiTools}")
+    implementation("io.github.smiley4:ktor-swagger-ui:${versionOpenApiTools}")
+    implementation("io.github.smiley4:ktor-redoc:${versionOpenApiTools}")
+
+    // schema-kenerator
+    val schemaKeneratorVersion = "2.5.0"
+    implementation("io.github.smiley4:schema-kenerator-core:${schemaKeneratorVersion}")
+    implementation("io.github.smiley4:schema-kenerator-serialization:${schemaKeneratorVersion}")
+    implementation("io.github.smiley4:schema-kenerator-swagger:${schemaKeneratorVersion}")
+
+    // testing
+    val versionKotest = "5.9.1"
+    testImplementation("io.kotest:kotest-runner-junit5:$versionKotest")
+    testImplementation("io.kotest:kotest-assertions-core:$versionKotest")
+    testImplementation("io.mockk:mockk:1.14.6")
 }
 
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(21)
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 detekt {
