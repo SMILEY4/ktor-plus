@@ -1,12 +1,13 @@
 package io.github.smiley4.ktorplus.core
 
 import io.github.smiley4.ktorplus.data.TypeDescriptorEntry
+import io.ktor.server.application.ApplicationCall
 import io.ktor.server.routing.RoutingCall
 
 /**
- * Handles a single property of an incoming request.
+ * Handles a single property of a websocket connection.
  */
-interface RequestPropertyHandler<TTypeDescriptorEntry : TypeDescriptorEntry> {
+interface ConnectionPropertyHandler<TTypeDescriptorEntry : TypeDescriptorEntry> {
 
     /**
      * @return whether this handler can handle the given property (described by the given descriptor).
@@ -16,17 +17,17 @@ interface RequestPropertyHandler<TTypeDescriptorEntry : TypeDescriptorEntry> {
 
 
     /**
-     * Handles the given property of the incoming request.
+     * Handles the given property of the websocket connection.
      * @return the values for properties to set. Keys must match names of actual [kotlin.reflect.KCallable]s.
      */
-    suspend fun handle(descriptor: TTypeDescriptorEntry, call: RoutingCall): Map<String, Any?>
+    suspend fun handle(descriptor: TTypeDescriptorEntry, call: ApplicationCall): Map<String, Any?>
 
 
     /**
      * Internal use only.
      * @see handle
      */
-    suspend fun unsafeHandle(descriptor: TypeDescriptorEntry, call: RoutingCall): Map<String, Any?> {
+    suspend fun unsafeHandle(descriptor: TypeDescriptorEntry, call: ApplicationCall): Map<String, Any?> {
         @Suppress("UNCHECKED_CAST")
         return handle(descriptor as TTypeDescriptorEntry, call)
     }

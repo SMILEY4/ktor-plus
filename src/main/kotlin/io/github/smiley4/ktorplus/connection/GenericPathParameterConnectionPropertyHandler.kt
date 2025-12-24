@@ -1,25 +1,25 @@
-package io.github.smiley4.ktorplus.request
+package io.github.smiley4.ktorplus.connection
 
 import io.github.smiley4.ktorplus.KtorPlusConfig
+import io.github.smiley4.ktorplus.core.ConnectionPropertyHandler
 import io.github.smiley4.ktorplus.core.ParameterDecoder
-import io.github.smiley4.ktorplus.core.RequestPropertyHandler
 import io.github.smiley4.ktorplus.data.TypeDescriptorEntry
 import io.github.smiley4.ktorplus.typedescriptor.PathParameterDescriptor
-import io.ktor.server.routing.RoutingCall
+import io.ktor.server.application.ApplicationCall
 
-class GenericPathParameterRequestPropertyHandler(
+class GenericPathParameterConnectionPropertyHandler(
     private val decoders: () -> List<ParameterDecoder<*>>
-) : RequestPropertyHandler<PathParameterDescriptor> {
+) : ConnectionPropertyHandler<PathParameterDescriptor> {
 
     override fun appliesTo(descriptor: TypeDescriptorEntry) = descriptor is PathParameterDescriptor
 
-    override suspend fun handle(descriptor: PathParameterDescriptor, call: RoutingCall): Map<String, Any?> {
+    override suspend fun handle(descriptor: PathParameterDescriptor, call: ApplicationCall): Map<String, Any?> {
         val rawValue = getRawValue(descriptor, call)
         val value = decode(rawValue, descriptor)
         return mapOf(descriptor.property.name to value)
     }
 
-    fun getRawValue(descriptor: PathParameterDescriptor, call: RoutingCall): String {
+    fun getRawValue(descriptor: PathParameterDescriptor, call: ApplicationCall): String {
         val value = call.parameters[descriptor.name]
         if (value == null) {
             throw IllegalArgumentException("Missing path parameter ${descriptor.name}")

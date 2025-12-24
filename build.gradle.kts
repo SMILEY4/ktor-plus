@@ -30,6 +30,8 @@ dependencies {
     implementation("io.ktor:ktor-server-auth:${versionKtor}")
     implementation("io.ktor:ktor-server-content-negotiation:${versionKtor}")
     implementation("io.ktor:ktor-serialization-kotlinx-json:${versionKtor}")
+    implementation("io.ktor:ktor-server-websockets:${versionKtor}")
+
 
     // OpenAPI
     val versionOpenApiTools = "5.4.0"
