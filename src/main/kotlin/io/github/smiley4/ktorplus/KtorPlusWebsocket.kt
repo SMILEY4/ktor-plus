@@ -14,11 +14,11 @@ import kotlin.reflect.typeOf
 import io.ktor.server.websocket.webSocket as ktorWebSocket
 
 @KtorDsl
-inline fun <reified TConnection : Any> Route.webSocket(
+inline fun <reified TConnection : Any, reified TMessage> Route.webSocket(
     path: String,
-    actions: WebSocketActionHandler<TConnection>.() -> Unit,
+    actions: WebSocketActionHandler<TConnection, TMessage>.() -> Unit,
 ) {
-    val actionHandler = WebSocketActionHandlerImpl<TConnection>().apply(actions)
+    val actionHandler = WebSocketActionHandlerImpl<TConnection, TMessage>().apply(actions)
 
     val typeDescriptorCache = TypeDescriptorCache(
         @Suppress("UNCHECKED_CAST")
@@ -37,27 +37,31 @@ inline fun <reified TConnection : Any> Route.webSocket(
         actionHandler.handlerOnOpen(connection)
 
         for (frame in incoming) {
-            frame as? Frame.Text ?: continue
-            val receivedContent = frame.readText()
-            actionHandler.handlerOnMessage(connection, receivedContent)
+            when (frame) {
+                is Frame.Text -> {
+                    val receivedContent = KtorPlusConfig.json.decodeFromString<TMessage>(frame.readText())
+                    actionHandler.handlerOnMessage(connection, receivedContent)
+                }
+                else -> Unit
+            }
         }
 
         actionHandler.handlerOnClose(connection)
     }
 }
 
-interface WebSocketActionHandler<TConnection> {
+interface WebSocketActionHandler<TConnection, TMessage> {
     fun onOpen(handler: (connection: TConnection) -> Unit)
     fun onClose(handler: (connection: TConnection) -> Unit)
-    fun onMessage(handler: (connection: TConnection, message: String) -> Unit)
+    fun onMessage(handler: (connection: TConnection, message: TMessage) -> Unit)
 }
 
 
-class WebSocketActionHandlerImpl<TConnection> : WebSocketActionHandler<TConnection> {
+class WebSocketActionHandlerImpl<TConnection, TMessage> : WebSocketActionHandler<TConnection, TMessage> {
 
     var handlerOnOpen: (connection: TConnection) -> Unit = {}
     var handlerOnClose: (connection: TConnection) -> Unit = {}
-    var handlerOnMessage: (connection: TConnection, message: String) -> Unit = { _, _ -> }
+    var handlerOnMessage: (connection: TConnection, message: TMessage) -> Unit = { _, _ -> }
 
     override fun onOpen(handler: (connection: TConnection) -> Unit) {
         handlerOnOpen = handler
@@ -67,7 +71,7 @@ class WebSocketActionHandlerImpl<TConnection> : WebSocketActionHandler<TConnecti
         handlerOnClose = handler
     }
 
-    override fun onMessage(handler: (connection: TConnection, message: String) -> Unit) {
+    override fun onMessage(handler: (connection: TConnection, message: TMessage) -> Unit) {
         handlerOnMessage = handler
     }
 

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalSerializationApi::class)
+
 package io.github.smiley4.ktorplus.examples
 
 import io.github.smiley4.ktoropenapi.OpenApi
@@ -29,8 +31,11 @@ import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.websocket.WebSockets
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonClassDiscriminator
 
 fun main() {
     embeddedServer(Netty, port = 8080, host = "localhost", module = Application::myModule).start(wait = true)
@@ -75,6 +80,8 @@ private fun Application.myModule() {
         json(json)
     }
 
+    KtorPlusConfig.json = json
+
     install(OpenApi) {
         info {
             title = "Group Vacation Planner API"
@@ -94,35 +101,8 @@ private fun Application.myModule() {
         }
     }
 
-    KtorPlusConfig.json = json
-
     routing {
-        route("api.json") {
-            openApi()
-        }
-        route("swagger") {
-            swaggerUI("/api.json")
-        }
-        route("redoc") {
-            redoc("/api.json")
-        }
-
-        post<LoginRequest, LoginResponse>("/login", {
-            description = "Allows the user to log in with personal credentials. Provides token used for further authentication."
-        }) { request ->
-            try {
-                if (request.body.username == "myusername" && request.body.password == "mysecret") {
-                    LoginResponse.Success(AuthDataDto("myuserid", "mytoken"))
-                } else {
-                    LoginResponse.Unauthorized()
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                LoginResponse.InternalError()
-            }
-        }
-
-        webSocket<ChatConnection>("chat/{roomId}") {
+        webSocket<ChatConnection, ChatMessage>("chat/{roomId}") {
             onOpen { connection ->
                 println("on open ${connection.roomId}")
             }
@@ -130,7 +110,10 @@ private fun Application.myModule() {
                 println("on close ${connection.roomId}")
             }
             onMessage { connection, message ->
-                println("on message ${connection.roomId}: $message")
+                when (message) {
+                    is ChatMessage.Text -> println("on text ${connection.roomId}: ${message.timestamp} ${message.message}")
+                    is ChatMessage.Emoji -> println("on emoji ${connection.roomId}: ${message.timestamp} ${message.emojiCode}")
+                }
             }
         }
     }
@@ -139,7 +122,7 @@ private fun Application.myModule() {
 
 
 @Connection
-private class ChatConnection(
+private data class ChatConnection(
     @PathParameter
     val roomId: String
 )
@@ -149,6 +132,27 @@ private class ChatConnection(
 private class LoginRequest(
     @Body val body: LoginData
 )
+
+
+@Serializable
+@JsonClassDiscriminator("_type")
+sealed interface ChatMessage {
+
+    @SerialName("text")
+    @Serializable
+    class Text(
+        val timestamp: Long,
+        val message: String
+    ) : ChatMessage
+
+    @SerialName("emoji")
+    @Serializable
+    class Emoji(
+        val timestamp: Long,
+        val emojiCode: Int
+    ) : ChatMessage
+
+}
 
 
 private sealed class LoginResponse {
