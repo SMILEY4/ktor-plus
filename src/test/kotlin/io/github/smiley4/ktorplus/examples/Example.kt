@@ -7,18 +7,15 @@ import io.github.smiley4.ktoropenapi.config.AuthScheme
 import io.github.smiley4.ktoropenapi.config.AuthType
 import io.github.smiley4.ktoropenapi.config.ExampleEncoder
 import io.github.smiley4.ktoropenapi.config.SchemaGenerator
-import io.github.smiley4.ktoropenapi.openApi
 import io.github.smiley4.ktorplus.KtorPlusConfig
+import io.github.smiley4.ktorplus.WebSocketContext
 import io.github.smiley4.ktorplus.data.Body
 import io.github.smiley4.ktorplus.data.Connection
 import io.github.smiley4.ktorplus.data.HttpStatusCode
 import io.github.smiley4.ktorplus.data.PathParameter
 import io.github.smiley4.ktorplus.data.Request
 import io.github.smiley4.ktorplus.data.Response
-import io.github.smiley4.ktorplus.post
 import io.github.smiley4.ktorplus.webSocket
-import io.github.smiley4.ktorredoc.redoc
-import io.github.smiley4.ktorswaggerui.swaggerUI
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -28,9 +25,9 @@ import io.ktor.server.auth.basic
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.websocket.WebSockets
+import io.ktor.websocket.CloseReason
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -101,19 +98,24 @@ private fun Application.myModule() {
         }
     }
 
+    val chatWsContext = WebSocketContext.create<ChatConnection, ServerChatMessage>()
+
+
     routing {
-        webSocket<ChatConnection, ChatMessage>("chat/{roomId}") {
-            onOpen { connection ->
+        webSocket<ChatConnection, ClientChatMessage, ServerChatMessage>("chat/{roomId}", chatWsContext) {
+            onOpen { context, connection ->
                 println("on open ${connection.roomId}")
             }
-            onClose { connection ->
+            onClose { context, connection ->
                 println("on close ${connection.roomId}")
             }
-            onMessage { connection, message ->
+            onMessage { context, connection, message ->
                 when (message) {
-                    is ChatMessage.Text -> println("on text ${connection.roomId}: ${message.timestamp} ${message.message}")
-                    is ChatMessage.Emoji -> println("on emoji ${connection.roomId}: ${message.timestamp} ${message.emojiCode}")
+                    is ClientChatMessage.Text -> println("on text ${connection.roomId}: ${message.timestamp} ${message.message}")
+                    is ClientChatMessage.Emoji -> println("on emoji ${connection.roomId}: ${message.timestamp} ${message.emojiCode}")
                 }
+                context.connections().send(ServerChatMessage(117, "Hello back"))
+                context.connections().close(CloseReason(CloseReason.Codes.NORMAL, "Ended Chat"))
             }
         }
     }
@@ -124,7 +126,7 @@ private fun Application.myModule() {
 @Connection
 private data class ChatConnection(
     @PathParameter
-    val roomId: String
+    val roomId: String,
 )
 
 
@@ -136,23 +138,31 @@ private class LoginRequest(
 
 @Serializable
 @JsonClassDiscriminator("_type")
-sealed interface ChatMessage {
+sealed interface ClientChatMessage {
 
     @SerialName("text")
     @Serializable
     class Text(
         val timestamp: Long,
         val message: String
-    ) : ChatMessage
+    ) : ClientChatMessage
+
 
     @SerialName("emoji")
     @Serializable
     class Emoji(
         val timestamp: Long,
         val emojiCode: Int
-    ) : ChatMessage
+    ) : ClientChatMessage
 
 }
+
+
+@Serializable
+class ServerChatMessage(
+    val timestamp: Long,
+    val message: String
+)
 
 
 private sealed class LoginResponse {

@@ -1,12 +1,13 @@
 package io.github.smiley4.ktorplus
 
-import io.github.smiley4.ktorplus.connection.GenericCallConnectionPropertyHandler
-import io.github.smiley4.ktorplus.connection.GenericCookieParameterConnectionPropertyHandler
-import io.github.smiley4.ktorplus.connection.GenericHeaderParameterConnectionPropertyHandler
-import io.github.smiley4.ktorplus.connection.GenericPathParameterConnectionPropertyHandler
-import io.github.smiley4.ktorplus.connection.GenericPrincipalConnectionPropertyHandler
-import io.github.smiley4.ktorplus.connection.GenericQueryParameterConnectionPropertyHandler
-import io.github.smiley4.ktorplus.core.ConnectionPropertyHandler
+import io.github.smiley4.ktorplus.connection.GenericCallWebSocketConnectionPropertyHandler
+import io.github.smiley4.ktorplus.connection.GenericCookieParameterWebSocketConnectionPropertyHandler
+import io.github.smiley4.ktorplus.connection.GenericHeaderParameterWebSocketConnectionPropertyHandler
+import io.github.smiley4.ktorplus.connection.GenericPathParameterWebSocketConnectionPropertyHandler
+import io.github.smiley4.ktorplus.connection.GenericPrincipalWebSocketConnectionPropertyHandler
+import io.github.smiley4.ktorplus.connection.GenericQueryParameterWebSocketConnectionPropertyHandler
+import io.github.smiley4.ktorplus.connection.GenericSessionWebSocketConnectionPropertyHandler
+import io.github.smiley4.ktorplus.core.WebSocketConnectionPropertyHandler
 import io.github.smiley4.ktorplus.core.GenericParameterTranscoder
 import io.github.smiley4.ktorplus.core.ParameterDecoder
 import io.github.smiley4.ktorplus.core.ParameterEncoder
@@ -81,13 +82,14 @@ object KtorPlusConfig {
         GenericStatusCodeResponseHandler(),
     )
 
-    val connectionHandlers: MutableList<ConnectionPropertyHandler<*>> = mutableListOf(
-        GenericCookieParameterConnectionPropertyHandler { decoders },
-        GenericHeaderParameterConnectionPropertyHandler { decoders },
-        GenericPathParameterConnectionPropertyHandler { decoders },
-        GenericQueryParameterConnectionPropertyHandler { decoders },
-        GenericCallConnectionPropertyHandler(),
-        GenericPrincipalConnectionPropertyHandler(),
+    val connectionHandlers: MutableList<WebSocketConnectionPropertyHandler<*>> = mutableListOf(
+        GenericCookieParameterWebSocketConnectionPropertyHandler { decoders },
+        GenericHeaderParameterWebSocketConnectionPropertyHandler { decoders },
+        GenericPathParameterWebSocketConnectionPropertyHandler { decoders },
+        GenericQueryParameterWebSocketConnectionPropertyHandler { decoders },
+        GenericCallWebSocketConnectionPropertyHandler(),
+        GenericSessionWebSocketConnectionPropertyHandler(),
+        GenericPrincipalWebSocketConnectionPropertyHandler(),
     )
 
 }

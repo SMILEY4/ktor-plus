@@ -1,19 +1,20 @@
 package io.github.smiley4.ktorplus.connection
 
 import io.github.smiley4.ktorplus.KtorPlusConfig
-import io.github.smiley4.ktorplus.core.ConnectionPropertyHandler
+import io.github.smiley4.ktorplus.core.WebSocketConnectionPropertyHandler
 import io.github.smiley4.ktorplus.core.ParameterDecoder
 import io.github.smiley4.ktorplus.data.TypeDescriptorEntry
 import io.github.smiley4.ktorplus.typedescriptor.PathParameterDescriptor
 import io.ktor.server.application.ApplicationCall
+import io.ktor.websocket.WebSocketSession
 
-class GenericPathParameterConnectionPropertyHandler(
+class GenericPathParameterWebSocketConnectionPropertyHandler(
     private val decoders: () -> List<ParameterDecoder<*>>
-) : ConnectionPropertyHandler<PathParameterDescriptor> {
+) : WebSocketConnectionPropertyHandler<PathParameterDescriptor> {
 
     override fun appliesTo(descriptor: TypeDescriptorEntry) = descriptor is PathParameterDescriptor
 
-    override suspend fun handle(descriptor: PathParameterDescriptor, call: ApplicationCall): Map<String, Any?> {
+    override suspend fun handle(descriptor: PathParameterDescriptor, call: ApplicationCall, session: WebSocketSession): Map<String, Any?> {
         val rawValue = getRawValue(descriptor, call)
         val value = decode(rawValue, descriptor)
         return mapOf(descriptor.property.name to value)

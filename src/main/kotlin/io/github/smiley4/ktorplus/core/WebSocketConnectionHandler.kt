@@ -2,14 +2,14 @@ package io.github.smiley4.ktorplus.core
 
 import io.github.smiley4.ktorplus.data.TypeDescriptor
 import io.ktor.server.application.ApplicationCall
-import io.ktor.server.routing.RoutingCall
+import io.ktor.websocket.WebSocketSession
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.isAccessible
 
 /**
  * Handles http connections. i.e. extracts required information from incoming calls.
  */
-class ConnectionHandler(private val connectionHandlers: List<ConnectionPropertyHandler<*>>) {
+class WebSocketConnectionHandler(private val connectionHandlers: List<WebSocketConnectionPropertyHandler<*>>) {
 
     /**
      * Handle a new connection - extracts information from the call and
@@ -17,8 +17,8 @@ class ConnectionHandler(private val connectionHandlers: List<ConnectionPropertyH
      * @param requestDescriptor the description of the connection format
      * @param call the ktor http call
      */
-    suspend inline fun <reified T : Any> handle(requestDescriptor: TypeDescriptor, call: ApplicationCall): T {
-        return createInstanceFromMap<T>(handleInternal(requestDescriptor, call))
+    suspend inline fun <reified T : Any> handle(requestDescriptor: TypeDescriptor, call: ApplicationCall, session: WebSocketSession): T {
+        return createInstanceFromMap<T>(handleInternal(requestDescriptor, call, session))
     }
 
 
@@ -26,14 +26,14 @@ class ConnectionHandler(private val connectionHandlers: List<ConnectionPropertyH
      * Internal use only.
      * @see handle
      */
-    suspend fun handleInternal(requestDescriptor: TypeDescriptor, call: ApplicationCall): Map<String, Any?> {
+    suspend fun handleInternal(requestDescriptor: TypeDescriptor, call: ApplicationCall, session: WebSocketSession): Map<String, Any?> {
 
         val connectionData = mutableMapOf<String, Any?>()
 
         requestDescriptor.entries.forEach { propertyDescriptor ->
             connectionHandlers
                 .find { it.appliesTo(propertyDescriptor) }
-                ?.unsafeHandle(propertyDescriptor, call)
+                ?.unsafeHandle(propertyDescriptor, call, session)
                 ?.also { connectionData.putAll(it) }
         }
 

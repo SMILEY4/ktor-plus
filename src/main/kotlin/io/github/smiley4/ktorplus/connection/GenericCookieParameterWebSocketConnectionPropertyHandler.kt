@@ -1,21 +1,20 @@
 package io.github.smiley4.ktorplus.connection
 
 import io.github.smiley4.ktorplus.KtorPlusConfig
-import io.github.smiley4.ktorplus.core.ConnectionPropertyHandler
+import io.github.smiley4.ktorplus.core.WebSocketConnectionPropertyHandler
 import io.github.smiley4.ktorplus.core.ParameterDecoder
-import io.github.smiley4.ktorplus.core.RequestPropertyHandler
 import io.github.smiley4.ktorplus.data.TypeDescriptorEntry
 import io.github.smiley4.ktorplus.typedescriptor.CookieParameterDescriptor
 import io.ktor.server.application.ApplicationCall
-import io.ktor.server.routing.RoutingCall
+import io.ktor.websocket.WebSocketSession
 
-class GenericCookieParameterConnectionPropertyHandler(
+class GenericCookieParameterWebSocketConnectionPropertyHandler(
     private val decoders: () -> List<ParameterDecoder<*>>
-) : ConnectionPropertyHandler<CookieParameterDescriptor> {
+) : WebSocketConnectionPropertyHandler<CookieParameterDescriptor> {
 
     override fun appliesTo(descriptor: TypeDescriptorEntry) = descriptor is CookieParameterDescriptor
 
-    override suspend fun handle(descriptor: CookieParameterDescriptor, call: ApplicationCall): Map<String, Any?> {
+    override suspend fun handle(descriptor: CookieParameterDescriptor, call: ApplicationCall, session: WebSocketSession): Map<String, Any?> {
         val rawValue = getRawValue(descriptor, call)
         val value = decode(rawValue, descriptor)
         return mapOf(descriptor.property.name to value)
