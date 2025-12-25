@@ -24,7 +24,7 @@ import kotlin.reflect.typeOf
 @KtorDsl
 inline fun <reified TRequest : Any, reified TResponse : Any> Route.get(
     noinline documentation: RouteConfig.() -> Unit = {},
-    crossinline body: (request: TRequest) -> TResponse
+    crossinline body: suspend (request: TRequest) -> TResponse
 ): Route {
     return methodPlus<TRequest, TResponse>(HttpMethod.Get, documentation, body)
 }
@@ -34,7 +34,7 @@ inline fun <reified TRequest : Any, reified TResponse : Any> Route.get(
 inline fun <reified TRequest : Any, reified TResponse : Any> Route.get(
     path: String,
     noinline documentation: RouteConfig.() -> Unit = {},
-    crossinline body: (request: TRequest) -> TResponse
+    crossinline body: suspend (request: TRequest) -> TResponse
 ): Route {
     return routePlus<TRequest, TResponse>(path, HttpMethod.Get, documentation, body)
 }
@@ -43,7 +43,7 @@ inline fun <reified TRequest : Any, reified TResponse : Any> Route.get(
 @KtorDsl
 inline fun <reified TRequest : Any, reified TResponse : Any> Route.post(
     noinline documentation: RouteConfig.() -> Unit = {},
-    crossinline body: (request: TRequest) -> TResponse
+    crossinline body: suspend (request: TRequest) -> TResponse
 ): Route {
     return methodPlus<TRequest, TResponse>(HttpMethod.Post, documentation, body)
 }
@@ -53,7 +53,7 @@ inline fun <reified TRequest : Any, reified TResponse : Any> Route.post(
 inline fun <reified TRequest : Any, reified TResponse : Any> Route.post(
     path: String,
     noinline documentation: RouteConfig.() -> Unit = {},
-    crossinline body: (request: TRequest) -> TResponse
+    crossinline body: suspend (request: TRequest) -> TResponse
 ): Route {
     return documentation(documentation) {
         routePlus<TRequest, TResponse>(path, HttpMethod.Post, documentation, body)
@@ -64,7 +64,7 @@ inline fun <reified TRequest : Any, reified TResponse : Any> Route.post(
 @KtorDsl
 inline fun <reified TRequest : Any, reified TResponse : Any> Route.put(
     noinline documentation: RouteConfig.() -> Unit = {},
-    crossinline body: (request: TRequest) -> TResponse
+    crossinline body: suspend (request: TRequest) -> TResponse
 ): Route {
     return methodPlus<TRequest, TResponse>(HttpMethod.Put, documentation, body)
 }
@@ -74,7 +74,7 @@ inline fun <reified TRequest : Any, reified TResponse : Any> Route.put(
 inline fun <reified TRequest : Any, reified TResponse : Any> Route.put(
     path: String,
     noinline documentation: RouteConfig.() -> Unit = {},
-    crossinline body: (request: TRequest) -> TResponse
+    crossinline body: suspend (request: TRequest) -> TResponse
 ): Route {
     return routePlus<TRequest, TResponse>(path, HttpMethod.Put, documentation, body)
 }
@@ -83,7 +83,7 @@ inline fun <reified TRequest : Any, reified TResponse : Any> Route.put(
 @KtorDsl
 inline fun <reified TRequest : Any, reified TResponse : Any> Route.delete(
     noinline documentation: RouteConfig.() -> Unit = {},
-    crossinline body: (request: TRequest) -> TResponse
+    crossinline body: suspend (request: TRequest) -> TResponse
 ): Route {
     return methodPlus<TRequest, TResponse>(HttpMethod.Delete, documentation, body)
 }
@@ -93,7 +93,7 @@ inline fun <reified TRequest : Any, reified TResponse : Any> Route.delete(
 inline fun <reified TRequest : Any, reified TResponse : Any> Route.delete(
     path: String,
     noinline documentation: RouteConfig.() -> Unit = {},
-    crossinline body: (request: TRequest) -> TResponse
+    crossinline body: suspend (request: TRequest) -> TResponse
 ): Route {
     return routePlus<TRequest, TResponse>(path, HttpMethod.Delete, documentation, body)
 }
@@ -104,7 +104,7 @@ inline fun <reified TRequest : Any, reified TResponse : Any> Route.routePlus(
     path: String,
     method: HttpMethod,
     noinline documentation: RouteConfig.() -> Unit = {},
-    crossinline body: (request: TRequest) -> TResponse
+    crossinline body: suspend (request: TRequest) -> TResponse
 ): Route {
     return route(path) {
         methodPlus<TRequest, TResponse>(method, documentation, body)
@@ -116,7 +116,7 @@ inline fun <reified TRequest : Any, reified TResponse : Any> Route.routePlus(
 inline fun <reified TRequest : Any, reified TResponse : Any> Route.methodPlus(
     method: HttpMethod,
     noinline documentation: RouteConfig.() -> Unit = {},
-    crossinline body: (request: TRequest) -> TResponse
+    crossinline body: suspend (request: TRequest) -> TResponse
 ): Route {
 
     val typeDescriptorCache = TypeDescriptorCache(
