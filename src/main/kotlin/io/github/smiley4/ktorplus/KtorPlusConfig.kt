@@ -36,6 +36,7 @@ import io.github.smiley4.ktorplus.typedescriptor.PrincipalAnalyzer
 import io.github.smiley4.ktorplus.typedescriptor.QueryParameterAnalyzer
 import io.github.smiley4.ktorplus.typedescriptor.RequestAnalyzer
 import io.github.smiley4.ktorplus.typedescriptor.ResponseAnalyzer
+import io.github.smiley4.ktorplus.typedescriptor.WebSocketConnectionAnalyzer
 import io.github.smiley4.ktorplus.typedescriptor.WebSocketSessionAnalyzer
 import kotlinx.serialization.json.Json
 
@@ -54,7 +55,7 @@ object KtorPlusConfig {
     val typeAnalyzers: MutableList<TypeAnalyzer<out Annotation, out TypeDescriptorEntry>> = mutableListOf(
         RequestAnalyzer(),
         ResponseAnalyzer(),
-        // todo: connection analyzer ???
+        WebSocketConnectionAnalyzer()
     )
 
     val propertyAnalyzers: MutableList<PropertyAnalyzer<out Annotation, out TypeDescriptorEntry>> = mutableListOf(

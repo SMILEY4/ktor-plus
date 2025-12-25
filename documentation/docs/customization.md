@@ -1,7 +1,5 @@
 # Customization
 
-
-
 ## Custom Request Properties
 
 **1. Create a new annotation for fields and properties**
@@ -74,9 +72,6 @@ have higher priority over matching handlers further back.
 ````kotlin
 KtorPlusConfig.requestHandlers.add(0, UserIdResponsePropertyHandler(KtorPlusConfig.encoders))
 ````
-
-
-
 
 ## Custom Response Properties
 
@@ -160,9 +155,6 @@ have higher priority over matching handlers further back.
 KtorPlusConfig.responseHandlers.add(0, UserIdResponsePropertyHandler(KtorPlusConfig.encoders))
 ````
 
-
-
-
 ## Custom WebSocket Connection Properties
 
 **1. Create a new annotation for fields and properties**
@@ -210,7 +202,8 @@ KtorPlusConfig.propertyAnalyzers.add(0, UserIdAnalyzer())
 
 **4. Create a handler for the property**
 
-This class handles the matching descriptor, extracts the actual value from the http request or websocket session and returns collected data.
+This class handles the matching descriptor, extracts the actual value from the http request or websocket session and
+returns collected data.
 The returned keys must match the property names in the class.
 
 ````kotlin
@@ -220,12 +213,16 @@ class UserIdWebSocketConnectionPropertyHandler(
 
     override fun appliesTo(descriptor: TypeDescriptorEntry) = descriptor is UserIdDescriptor
 
-    override suspend fun handle(descriptor: HeaderParameterDescriptor, call: ApplicationCall, session: WebSocketSession): Map<String, Any?> {
+    override suspend fun handle(
+        descriptor: HeaderParameterDescriptor,
+        call: ApplicationCall,
+        session: WebSocketSession
+    ): Map<String, Any?> {
         val rawValue = // ... get value from call or session
         val value = decode(rawValue, descriptor)
         return mapOf(descriptor.property.name to value)
     }
-    
+
     fun decode(rawValue: String?, descriptor: HeaderParameterDescriptor): Any? {
         val decoder = decoders().firstOrNull { it.canHandle(descriptor.property.returnType) }
             ?: throw IllegalStateException("No decoder found for type ${descriptor.property.returnType}")
@@ -240,13 +237,10 @@ class UserIdWebSocketConnectionPropertyHandler(
 KtorPlusConfig.connectionHandlers.add(0, UserIdWebSocketConnectionPropertyHandler(KtorPlusConfig.encoders))
 ````
 
-
-
-
 ## Custom Types
 
-To handle types that are not directly serializable by kotlinx-serialization of require additional handling, custom
-encoders and decoders can be created.
+Values for parameters (e.g. headers, url parameters, cookies, etc) are usually encoded using a simple "to string"
+function. For more complex types or types that require special handling, custom type encoders/decoders can be added.
 
 ````kotlin
 @JvmInline

@@ -146,7 +146,7 @@ class WebSocketContextImpl<TConnection : Any, TServerMessage>(
 
     suspend fun send(connection: TConnection, message: TServerMessage) {
         connections[connection]?.also { session ->
-            session.send(KtorPlusConfig.json.encodeToString(serializer, message)) // todo: use ktorPlusConfig.encoders() ???
+            session.send(KtorPlusConfig.json.encodeToString(serializer, message))
         }
     }
 
