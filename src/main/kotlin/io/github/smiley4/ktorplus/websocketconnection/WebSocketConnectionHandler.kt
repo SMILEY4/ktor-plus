@@ -1,8 +1,9 @@
-package io.github.smiley4.ktorplus.core
+package io.github.smiley4.ktorplus.websocketconnection
 
-import io.github.smiley4.ktorplus.data.TypeDescriptor
+import io.github.smiley4.ktorplus.typedescriptor.TypeDescriptor
 import io.ktor.server.application.ApplicationCall
 import io.ktor.websocket.WebSocketSession
+import kotlin.collections.get
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.isAccessible
 

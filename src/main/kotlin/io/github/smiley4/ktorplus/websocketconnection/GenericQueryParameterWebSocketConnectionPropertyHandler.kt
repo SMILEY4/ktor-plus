@@ -1,13 +1,15 @@
-package io.github.smiley4.ktorplus.connection
+package io.github.smiley4.ktorplus.websocketconnection
 
 import io.github.smiley4.ktorplus.KtorPlusConfig
-import io.github.smiley4.ktorplus.core.WebSocketConnectionPropertyHandler
 import io.github.smiley4.ktorplus.core.ParameterDecoder
-import io.github.smiley4.ktorplus.data.TypeDescriptorEntry
+import io.github.smiley4.ktorplus.typedescriptor.TypeDescriptorEntry
 import io.github.smiley4.ktorplus.typedescriptor.QueryParameterDescriptor
 import io.ktor.server.application.ApplicationCall
 import io.ktor.websocket.WebSocketSession
 
+/**
+ * Provides access to a url query parameter from the incoming http request.
+ */
 class GenericQueryParameterWebSocketConnectionPropertyHandler(
     private val decoders: () -> List<ParameterDecoder<*>>
 ) : WebSocketConnectionPropertyHandler<QueryParameterDescriptor> {
@@ -23,14 +25,14 @@ class GenericQueryParameterWebSocketConnectionPropertyHandler(
     fun getRawValue(descriptor: QueryParameterDescriptor, call: ApplicationCall): String? {
         val value = call.parameters[descriptor.name]
         if (value == null && descriptor.required) {
-            throw IllegalArgumentException("Missing path parameter ${descriptor.name}")
+            throw IllegalArgumentException("Missing query parameter with name ${descriptor.name}")
         }
         return value
     }
 
     fun decode(rawValue: String?, descriptor: QueryParameterDescriptor): Any? {
         val decoder = decoders().firstOrNull { it.canHandle(descriptor.property.returnType) }
-            ?: throw IllegalStateException("No decoder found for type ${descriptor.property.returnType}")
+            ?: throw IllegalStateException("No decoder found for property ${descriptor.property.name} with type ${descriptor.property.returnType}")
         return decoder.decode(rawValue, descriptor.property.returnType, KtorPlusConfig.json)
     }
 

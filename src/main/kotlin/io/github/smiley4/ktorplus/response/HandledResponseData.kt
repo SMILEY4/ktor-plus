@@ -1,4 +1,4 @@
-package io.github.smiley4.ktorplus.data
+package io.github.smiley4.ktorplus.response
 
 import io.ktor.http.HttpStatusCode
 

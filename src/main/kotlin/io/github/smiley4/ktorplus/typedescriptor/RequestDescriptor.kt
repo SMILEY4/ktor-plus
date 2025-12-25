@@ -2,7 +2,6 @@ package io.github.smiley4.ktorplus.typedescriptor
 
 import io.github.smiley4.ktorplus.core.TypeAnalyzer
 import io.github.smiley4.ktorplus.data.Request
-import io.github.smiley4.ktorplus.data.TypeDescriptorEntry
 import kotlin.reflect.KClass
 import kotlin.reflect.typeOf
 

@@ -1,9 +1,6 @@
-package io.github.smiley4.ktorplus.core
+package io.github.smiley4.ktorplus.response
 
-import io.github.smiley4.ktorplus.data.HandledResponseBody
-import io.github.smiley4.ktorplus.data.HandledResponseData
-import io.github.smiley4.ktorplus.data.HandledStatusCode
-import io.github.smiley4.ktorplus.data.TypeDescriptor
+import io.github.smiley4.ktorplus.typedescriptor.TypeDescriptor
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
 import io.ktor.server.routing.RoutingCall
@@ -32,9 +29,9 @@ class ResponseHandler(private val propertyHandlers: List<ResponsePropertyHandler
         val statusCode = responseData.filterIsInstance<HandledStatusCode>().lastOrNull()?.value
 
         if (body != null) {
-            call.respond(statusCode ?: HttpStatusCode.OK, body)
+            call.respond(statusCode ?: HttpStatusCode.Companion.OK, body)
         } else {
-            call.respond(statusCode ?: HttpStatusCode.OK)
+            call.respond(statusCode ?: HttpStatusCode.Companion.OK)
         }
 
     }

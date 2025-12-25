@@ -3,12 +3,12 @@ package io.github.smiley4.ktorplus
 import io.github.smiley4.ktoropenapi.config.RouteConfig
 import io.github.smiley4.ktoropenapi.documentation
 import io.github.smiley4.ktorplus.core.PropertyAnalyzer
-import io.github.smiley4.ktorplus.core.RequestHandler
-import io.github.smiley4.ktorplus.core.ResponseHandler
+import io.github.smiley4.ktorplus.request.RequestHandler
+import io.github.smiley4.ktorplus.response.ResponseHandler
 import io.github.smiley4.ktorplus.core.TypeAnalyzer
 import io.github.smiley4.ktorplus.core.TypeDescriptorCache
 import io.github.smiley4.ktorplus.core.TypeDescriptorCreator
-import io.github.smiley4.ktorplus.data.TypeDescriptorEntry
+import io.github.smiley4.ktorplus.typedescriptor.TypeDescriptorEntry
 import io.github.smiley4.ktorplus.openapi.KtorPlusRouteOpenApiHandler
 import io.ktor.http.HttpMethod
 import io.ktor.server.auth.AuthenticationRouteSelector

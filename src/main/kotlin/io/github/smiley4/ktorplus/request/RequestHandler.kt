@@ -1,6 +1,6 @@
-package io.github.smiley4.ktorplus.core
+package io.github.smiley4.ktorplus.request
 
-import io.github.smiley4.ktorplus.data.TypeDescriptor
+import io.github.smiley4.ktorplus.typedescriptor.TypeDescriptor
 import io.ktor.server.routing.RoutingCall
 import kotlin.collections.get
 import kotlin.reflect.full.primaryConstructor

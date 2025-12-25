@@ -1,6 +1,6 @@
 package io.github.smiley4.ktorplus.core
 
-import io.github.smiley4.ktorplus.data.TypeDescriptor
+import io.github.smiley4.ktorplus.typedescriptor.TypeDescriptor
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 

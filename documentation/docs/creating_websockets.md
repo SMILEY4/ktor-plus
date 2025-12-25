@@ -34,8 +34,8 @@ Values are mostly derived from the initial http request and are available for th
 - `@HeaderParameter` - injects header value with the same or specified name
 - `@CookieParameter` - injects cookie value with the same or specified name
 - `@Principal` - injects the ktor authentication principal
-- `@Call` - injects the underlying ktor call
-- `@WebSocketSession` - injects the underlying ktor websocket session
+- `@Call` - injects the underlying ktor call. Property type must be a ktor ApplicationCall.
+- `@WebSocketSession` - injects the underlying ktor websocket session. . Property type must be a ktor WebSocketSession.
 
 
 ## Incoming messages

@@ -2,11 +2,13 @@ package io.github.smiley4.ktorplus.request
 
 import io.github.smiley4.ktorplus.KtorPlusConfig
 import io.github.smiley4.ktorplus.core.ParameterDecoder
-import io.github.smiley4.ktorplus.core.RequestPropertyHandler
-import io.github.smiley4.ktorplus.data.TypeDescriptorEntry
+import io.github.smiley4.ktorplus.typedescriptor.TypeDescriptorEntry
 import io.github.smiley4.ktorplus.typedescriptor.CookieParameterDescriptor
 import io.ktor.server.routing.RoutingCall
 
+/**
+ * Provides access to a cookie from the incoming http request.
+ */
 class GenericCookieParameterRequestPropertyHandler(
     private val decoders: () -> List<ParameterDecoder<*>>
 ) : RequestPropertyHandler<CookieParameterDescriptor> {
@@ -22,14 +24,14 @@ class GenericCookieParameterRequestPropertyHandler(
     private fun getRawValue(descriptor: CookieParameterDescriptor, call: RoutingCall): String? {
         val value = call.request.cookies[descriptor.name]
         if (value == null && descriptor.required) {
-            throw IllegalArgumentException("Missing cookie ${descriptor.name}")
+            throw IllegalArgumentException("Missing cookie with name ${descriptor.name}")
         }
         return value
     }
 
     private fun decode(rawValue: String?, descriptor: CookieParameterDescriptor): Any? {
         val decoder = decoders().firstOrNull { it.canHandle(descriptor.property.returnType) }
-            ?: throw IllegalStateException("No decoder found for type ${descriptor.property.returnType}")
+            ?: throw IllegalStateException("No decoder found for property ${descriptor.property.name} with type ${descriptor.property.returnType}")
         return decoder.decode(rawValue, descriptor.property.returnType, KtorPlusConfig.json)
     }
 

@@ -1,4 +1,4 @@
-package io.github.smiley4.ktorplus.data
+package io.github.smiley4.ktorplus.typedescriptor
 
 /**
  * Describes a request or response type/definition.

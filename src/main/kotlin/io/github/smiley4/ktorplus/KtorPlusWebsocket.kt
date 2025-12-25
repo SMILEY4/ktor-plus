@@ -1,11 +1,11 @@
 package io.github.smiley4.ktorplus
 
-import io.github.smiley4.ktorplus.core.WebSocketConnectionHandler
+import io.github.smiley4.ktorplus.websocketconnection.WebSocketConnectionHandler
 import io.github.smiley4.ktorplus.core.PropertyAnalyzer
 import io.github.smiley4.ktorplus.core.TypeAnalyzer
 import io.github.smiley4.ktorplus.core.TypeDescriptorCache
 import io.github.smiley4.ktorplus.core.TypeDescriptorCreator
-import io.github.smiley4.ktorplus.data.TypeDescriptorEntry
+import io.github.smiley4.ktorplus.typedescriptor.TypeDescriptorEntry
 import io.ktor.server.routing.Route
 import io.ktor.utils.io.KtorDsl
 import io.ktor.websocket.CloseReason
