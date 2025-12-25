@@ -42,7 +42,7 @@ inline fun <reified TConnection : Any, reified TClientMessage, reified TServerMe
 
     ktorWebSocket(path, null) {
         val connectionDescriptor = typeDescriptorCache.get(typeOf<TConnection>())
-        val connection = webSocketConnectionHandler.handle<TConnection>(connectionDescriptor, call)
+        val connection = webSocketConnectionHandler.handle<TConnection>(connectionDescriptor, call, this)
 
         try {
             context.registerConnection(this, connection)
@@ -146,7 +146,7 @@ class WebSocketContextImpl<TConnection : Any, TServerMessage>(
 
     suspend fun send(connection: TConnection, message: TServerMessage) {
         connections[connection]?.also { session ->
-            session.send(KtorPlusConfig.json.encodeToString(serializer, message))
+            session.send(KtorPlusConfig.json.encodeToString(serializer, message)) // todo: use ktorPlusConfig.encoders() ???
         }
     }
 

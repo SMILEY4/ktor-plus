@@ -81,8 +81,8 @@ private fun Application.myModule() {
 
     install(OpenApi) {
         info {
-            title = "Group Vacation Planner API"
-            version = "indev"
+            title = "Example"
+            version = "0.1"
         }
         security {
             securityScheme("user_auth") {
@@ -99,7 +99,6 @@ private fun Application.myModule() {
     }
 
     val chatWsContext = WebSocketContext.create<ChatConnection, ServerChatMessage>()
-
 
     routing {
         webSocket<ChatConnection, ClientChatMessage, ServerChatMessage>("chat/{roomId}", chatWsContext) {
@@ -119,6 +118,10 @@ private fun Application.myModule() {
             }
         }
     }
+
+    chatWsContext.connections().send(ServerChatMessage(117, "Hello back"))
+
+
 
 }
 
