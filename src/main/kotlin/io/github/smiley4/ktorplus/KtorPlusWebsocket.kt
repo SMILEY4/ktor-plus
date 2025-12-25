@@ -1,11 +1,11 @@
 package io.github.smiley4.ktorplus
 
-import io.github.smiley4.ktorplus.websocketconnection.WebSocketConnectionHandler
 import io.github.smiley4.ktorplus.core.PropertyAnalyzer
 import io.github.smiley4.ktorplus.core.TypeAnalyzer
 import io.github.smiley4.ktorplus.core.TypeDescriptorCache
 import io.github.smiley4.ktorplus.core.TypeDescriptorCreator
 import io.github.smiley4.ktorplus.typedescriptor.TypeDescriptorEntry
+import io.github.smiley4.ktorplus.websocketconnection.WebSocketConnectionHandler
 import io.ktor.server.routing.Route
 import io.ktor.utils.io.KtorDsl
 import io.ktor.websocket.CloseReason
@@ -16,7 +16,6 @@ import io.ktor.websocket.readText
 import io.ktor.websocket.send
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.serializer
-import java.lang.Exception
 import kotlin.reflect.typeOf
 import io.ktor.server.websocket.webSocket as ktorWebSocket
 
@@ -70,17 +69,32 @@ inline fun <reified TConnection : Any, reified TClientMessage, reified TServerMe
 }
 
 interface WebSocketActionHandler<TConnection : Any, TClientMessage, TServerMessage> {
-    fun onOpen(handler: suspend (context: WebSocketContext<TConnection, TServerMessage>, connection: TConnection) -> Unit)
-    fun onClose(handler: suspend (context: WebSocketContext<TConnection, TServerMessage>, connection: TConnection) -> Unit)
-    fun onMessage(handler: suspend (context: WebSocketContext<TConnection, TServerMessage>, connection: TConnection, message: TClientMessage) -> Unit)
+    fun onOpen(
+        handler: suspend (context: WebSocketContext<TConnection, TServerMessage>, connection: TConnection) -> Unit
+    )
+
+    fun onClose(
+        handler: suspend (context: WebSocketContext<TConnection, TServerMessage>, connection: TConnection) -> Unit
+    )
+
+    fun onMessage(
+        handler: suspend (context: WebSocketContext<TConnection, TServerMessage>, connection: TConnection, message: TClientMessage) -> Unit
+    )
 }
 
 
-class WebSocketActionHandlerImpl<TConnection : Any, TClientMessage, TServerMessage> : WebSocketActionHandler<TConnection, TClientMessage, TServerMessage> {
+class WebSocketActionHandlerImpl<TConnection : Any, TClientMessage, TServerMessage> :
+    WebSocketActionHandler<TConnection, TClientMessage, TServerMessage> {
 
     var handlerOnOpen: suspend (context: WebSocketContext<TConnection, TServerMessage>, connection: TConnection) -> Unit = { _, _ -> }
+
     var handlerOnClose: suspend (context: WebSocketContext<TConnection, TServerMessage>, connection: TConnection) -> Unit = { _, _ -> }
-    var handlerOnMessage: suspend (context: WebSocketContext<TConnection, TServerMessage>, connection: TConnection, message: TClientMessage) -> Unit = { _, _, _ -> }
+
+    var handlerOnMessage: suspend (
+        context: WebSocketContext<TConnection, TServerMessage>,
+        connection: TConnection,
+        message: TClientMessage
+    ) -> Unit = { _, _, _ -> }
 
     override fun onOpen(handler: suspend (context: WebSocketContext<TConnection, TServerMessage>, connection: TConnection) -> Unit) {
         handlerOnOpen = handler
@@ -90,7 +104,9 @@ class WebSocketActionHandlerImpl<TConnection : Any, TClientMessage, TServerMessa
         handlerOnClose = handler
     }
 
-    override fun onMessage(handler: suspend  (context: WebSocketContext<TConnection, TServerMessage>, connection: TConnection, message: TClientMessage) -> Unit) {
+    override fun onMessage(
+        handler: suspend (context: WebSocketContext<TConnection, TServerMessage>, connection: TConnection, message: TClientMessage) -> Unit
+    ) {
         handlerOnMessage = handler
     }
 

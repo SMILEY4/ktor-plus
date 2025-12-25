@@ -15,7 +15,9 @@ class GenericCallRequestPropertyHandler : RequestPropertyHandler<CallDescriptor>
 
     override suspend fun handle(descriptor: CallDescriptor, call: RoutingCall): Map<String, Any?> {
         if (descriptor.property.returnType !== typeOf<RoutingCall>()) {
-            throw IllegalArgumentException("Invalid type of property ${descriptor.property.name}, expected ${RoutingCall::class.qualifiedName}")
+            throw IllegalArgumentException(
+                "Invalid type of property ${descriptor.property.name}, expected ${RoutingCall::class.qualifiedName}"
+            )
         }
         return mapOf(
             descriptor.property.name to call,

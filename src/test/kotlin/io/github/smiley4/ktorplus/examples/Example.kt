@@ -13,7 +13,6 @@ import io.github.smiley4.ktorplus.data.Body
 import io.github.smiley4.ktorplus.data.Connection
 import io.github.smiley4.ktorplus.data.HttpStatusCode
 import io.github.smiley4.ktorplus.data.PathParameter
-import io.github.smiley4.ktorplus.data.Request
 import io.github.smiley4.ktorplus.data.Response
 import io.github.smiley4.ktorplus.webSocket
 import io.ktor.serialization.kotlinx.json.json
@@ -119,10 +118,6 @@ private fun Application.myModule() {
         }
     }
 
-    chatWsContext.connections().send(ServerChatMessage(117, "Hello back"))
-
-
-
 }
 
 
@@ -131,13 +126,6 @@ private data class ChatConnection(
     @PathParameter
     val roomId: String,
 )
-
-
-@Request
-private class LoginRequest(
-    @Body val body: LoginData
-)
-
 
 @Serializable
 @JsonClassDiscriminator("_type")
@@ -188,14 +176,6 @@ private sealed class LoginResponse {
     ) : LoginResponse()
 
 }
-
-
-@Serializable
-private data class LoginData(
-    val username: String,
-    val password: String
-)
-
 
 @Serializable
 private data class AuthDataDto(

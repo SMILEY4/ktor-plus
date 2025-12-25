@@ -2,8 +2,8 @@ package io.github.smiley4.ktorplus.websocketconnection
 
 import io.github.smiley4.ktorplus.KtorPlusConfig
 import io.github.smiley4.ktorplus.core.ParameterDecoder
-import io.github.smiley4.ktorplus.typedescriptor.TypeDescriptorEntry
 import io.github.smiley4.ktorplus.typedescriptor.HeaderParameterDescriptor
+import io.github.smiley4.ktorplus.typedescriptor.TypeDescriptorEntry
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.request.header
 import io.ktor.websocket.WebSocketSession
@@ -17,7 +17,11 @@ class GenericHeaderParameterWebSocketConnectionPropertyHandler(
 
     override fun appliesTo(descriptor: TypeDescriptorEntry) = descriptor is HeaderParameterDescriptor
 
-    override suspend fun handle(descriptor: HeaderParameterDescriptor, call: ApplicationCall, session: WebSocketSession): Map<String, Any?> {
+    override suspend fun handle(
+        descriptor: HeaderParameterDescriptor,
+        call: ApplicationCall,
+        session: WebSocketSession
+    ): Map<String, Any?> {
         val rawValue = getRawValue(descriptor, call)
         val value = decode(rawValue, descriptor)
         return mapOf(descriptor.property.name to value)
@@ -33,7 +37,9 @@ class GenericHeaderParameterWebSocketConnectionPropertyHandler(
 
     fun decode(rawValue: String?, descriptor: HeaderParameterDescriptor): Any? {
         val decoder = decoders().firstOrNull { it.canHandle(descriptor.property.returnType) }
-            ?: throw IllegalStateException("No decoder found for property ${descriptor.property.name} with type ${descriptor.property.returnType}")
+            ?: throw IllegalStateException(
+                "No decoder found for property ${descriptor.property.name} with type ${descriptor.property.returnType}"
+            )
         return decoder.decode(rawValue, descriptor.property.returnType, KtorPlusConfig.json)
     }
 

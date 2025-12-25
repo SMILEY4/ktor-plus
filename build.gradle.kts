@@ -13,7 +13,7 @@ plugins {
     kotlin("plugin.serialization") version "2.3.0"
     id("org.jetbrains.dokka") version "1.9.20"
     id("org.owasp.dependencycheck") version "8.2.1"
-    id("io.gitlab.arturbosch.detekt") version "1.23.0"
+    id("io.gitlab.arturbosch.detekt") version "1.23.8"
     id("com.vanniktech.maven.publish") version "0.33.0"
     id("com.github.ben-manes.versions") version "0.51.0"
 }
@@ -77,7 +77,7 @@ tasks.withType<Detekt>().configureEach {
 }
 
 tasks.withType<DokkaTask>().configureEach {
-    outputDirectory.set(file("$rootDir/docs/dokka/ktor-openapi"))
+    outputDirectory.set(file("$rootDir/documentation/docs/dokka/ktor-plus"))
 }
 
 mavenPublishing {
@@ -93,7 +93,7 @@ mavenPublishing {
 
     configure(KotlinJvm(JavadocJar.Dokka("dokkaHtml"), true))
     publishToMavenCentral(automaticRelease = true)
-//    signAllPublications()
+    signAllPublications()
     coordinates(projectGroupId, projectArtifactId, projectVersion)
     pom {
         name.set("Ktor-Plus")

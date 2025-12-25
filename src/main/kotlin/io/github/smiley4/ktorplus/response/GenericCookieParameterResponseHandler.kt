@@ -32,7 +32,9 @@ class GenericCookieParameterResponseHandler(
             else -> {
                 val encoder = encoders()
                     .firstOrNull { it.canHandle(descriptor.property.returnType) }
-                    ?: throw IllegalStateException("No decoder found for property ${descriptor.property.name} with type ${descriptor.property.returnType}")
+                    ?: throw IllegalStateException(
+                        "No decoder found for property ${descriptor.property.name} with type ${descriptor.property.returnType}"
+                    )
                 encoder.encodeUnsafe(value)?.also {
                     call.response.cookies.append(descriptor.property.name, it)
                 }

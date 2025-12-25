@@ -15,7 +15,9 @@ class GenericSessionWebSocketConnectionPropertyHandler : WebSocketConnectionProp
 
     override suspend fun handle(descriptor: CallDescriptor, call: ApplicationCall, session: WebSocketSession): Map<String, Any?> {
         if (descriptor.property.returnType !== typeOf<WebSocketSession>()) {
-            throw IllegalArgumentException("Invalid type of property ${descriptor.property.name}, expected ${WebSocketSession::class.qualifiedName}")
+            throw IllegalArgumentException(
+                "Invalid type of property ${descriptor.property.name}, expected ${WebSocketSession::class.qualifiedName}"
+            )
         }
         return mapOf(
             descriptor.property.name to session,
