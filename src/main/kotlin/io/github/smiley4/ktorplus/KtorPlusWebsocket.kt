@@ -130,6 +130,7 @@ interface WebSocketConnectionSet<TConnection : Any, TServerMessage> {
     fun filter(predicate: (TConnection) -> Boolean): WebSocketConnectionSet<TConnection, TServerMessage>
     fun toList(): List<TConnection>
     suspend fun send(message: TServerMessage)
+    suspend fun send(messageBuilder: (TConnection) -> TServerMessage)
     suspend fun close(reason: CloseReason)
 }
 
@@ -189,6 +190,10 @@ class WebSocketConnectionSetImpl<TConnection : Any, TServerMessage>(
 
     override suspend fun send(message: TServerMessage) {
         connections.forEach { context.send(it, message) }
+    }
+
+    override suspend fun send(messageBuilder: (TConnection) -> TServerMessage) {
+        connections.forEach { context.send(it, messageBuilder(it)) }
     }
 
     override suspend fun close(reason: CloseReason) {
