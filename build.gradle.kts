@@ -2,6 +2,7 @@ import com.vanniktech.maven.publish.KotlinJvm
 import io.gitlab.arturbosch.detekt.Detekt
 import org.jetbrains.dokka.gradle.DokkaTask
 import com.vanniktech.maven.publish.JavadocJar
+import org.jetbrains.kotlin.gradle.internal.backend.common.serialization.metadata.DynamicTypeDeserializer.id
 
 val projectGroupId: String by project
 val projectVersion: String by project
@@ -24,7 +25,7 @@ repositories {
 
 dependencies {
     // ktor
-    val versionKtor = "3.3.3"
+    val versionKtor = "3.4.3"
     implementation("io.ktor:ktor-server-core:$versionKtor")
     implementation("io.ktor:ktor-server-netty:$versionKtor")
     implementation("io.ktor:ktor-server-auth:${versionKtor}")
@@ -34,13 +35,13 @@ dependencies {
 
 
     // OpenAPI
-    val versionOpenApiTools = "5.4.0"
+    val versionOpenApiTools = "5.7.0"
     implementation("io.github.smiley4:ktor-openapi:${versionOpenApiTools}")
     implementation("io.github.smiley4:ktor-swagger-ui:${versionOpenApiTools}")
     implementation("io.github.smiley4:ktor-redoc:${versionOpenApiTools}")
 
     // schema-kenerator
-    val schemaKeneratorVersion = "2.5.0"
+    val schemaKeneratorVersion = "2.7.0"
     implementation("io.github.smiley4:schema-kenerator-core:${schemaKeneratorVersion}")
     implementation("io.github.smiley4:schema-kenerator-serialization:${schemaKeneratorVersion}")
     implementation("io.github.smiley4:schema-kenerator-swagger:${schemaKeneratorVersion}")
